@@ -26,11 +26,12 @@ long oldPosition  = -999;
 boolean result;
 double duration, abs_duration;//the number of the pulses
 double RPM = 1;
+double newPosition;
 double pid_output; //Power supplied to the motor PWM value.
 double Setpoint;
-double Kp=12, Ki=2, Kd=0.0;
+double Kp=4, Ki=0.3, Kd=0.0;
 //PID myPID(&abs_duration, &val_output, &Setpoint, Kp, Ki, Kd, DIRECT);
-PID myPID(&RPM, &pid_output, &Setpoint, Kp, Ki, Kd, DIRECT);
+PID myPID(&newPosition, &pid_output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
 unsigned long start_time = millis();
 unsigned long last_time_for_revolution = millis();
@@ -55,22 +56,6 @@ void setup() {
   digitalWrite(m2_in1, LOW);
   digitalWrite(m2_in2, LOW);
 
-  //analogWrite(en1_pwm, 150);
-
-  Setpoint = 4;  //Set the output value of the PID
-  myPID.SetMode(AUTOMATIC);//PID is set to automatic mode
-  //myPID.SetSampleTime(100);//Set PID sampling frequency is 100ms // todo this is completely wrong since we're direct?
-  myPID.SetSampleTime(check_rpm_period);
-  //myPID.SetOutputLimits(-255, 255);  // no, just better to do stick with 0-255 and change direction
-
-  if (Setpoint < 0) {
-    motor_direction = false;
-  }
-  else {
-    motor_direction = true;
-  }
-
-  // todo make function? many functions?
   if (motor_direction == true) {
     digitalWrite(m1_in1, HIGH);
     digitalWrite(m1_in2, LOW);
@@ -83,6 +68,12 @@ void setup() {
     digitalWrite(m2_in1, LOW);
     digitalWrite(m2_in2, HIGH);
   }
+
+  //analogWrite(en1_pwm, 150);
+
+  Setpoint = 8234;  //Set the output value of the PID
+  myPID.SetMode(AUTOMATIC);//PID is set to automatic mode
+  myPID.SetSampleTime(100);//Set PID sampling frequency is 100ms
   
   //Serial.println("Started motor");
 
@@ -173,113 +164,52 @@ void loop() {
     }*/
   }
 
-  long newPosition = myEnc.read();
+  /*analogWrite(en1_pwm, pid_output);
+  abs_duration = abs(duration);
+  result = myPID.Compute(); //PID conversion is complete and returns 1
+  if(result)
+  {
+    Serial.print("Plus: ");
+    Serial.println(duration);
+    duration = 0; //Count clear, wait for the next count
+  }*/
+
+  /*if(result)
+  {
+    Serial.print("Plus: ");
+    Serial.println(duration);
+    duration = 0; //Count clear, wait for the next count
+  }*/
+
+  newPosition = myEnc.read();
+  //if (newPosition != oldPosition) {  // todo could do more regularly
   long curr_time = millis() - start_time;
   long time_difference = curr_time - prev_time;
+  /*Serial.println(curr_time);
+  Serial.println(prev_time);*/
   if (time_difference > check_rpm_period) {
     prev_time = curr_time;
     
     int num_pulses_in_period = abs(newPosition - oldPosition);
-    //int num_pulses_in_period = newPosition - oldPosition;
     double pulses_per_second = (1000.0 / (double)time_difference) * (double)num_pulses_in_period;
     double time_for_one_revolution = (double)pulses_per_revolution / pulses_per_second;
     RPM = 60.0 / time_for_one_revolution;
-
-    if (newPosition - oldPosition > 0) {
-      //curr_motor_direction = true;
-    }
-    else if (newPosition - oldPosition < 0) {
-      //curr_motor_direction = false;
-      
-      //RPM = RPM * -1;
-    }
-    else {
-      // change actual direction
-      // todo make sure no floating point errors
-      
-      //Serial.println("Changing direction!!!");
-      /*if (motor_direction && Setpoint - RPM < 0) {
-        motor_direction = false;
-        Serial.println("Was forward and error was negative so now reverse");
-      }
-      else if (!motor_direction && Setpoint - RPM > 0) {
-        motor_direction = true;
-        Serial.println("Was reverse and error was positive so now forward");
-      }
-      
-      //motor_direction = !motor_direction;
-      if (motor_direction == true) {
-        digitalWrite(m1_in1, HIGH);
-        digitalWrite(m1_in2, LOW);
-        digitalWrite(m2_in1, HIGH);
-        digitalWrite(m2_in2, LOW);
-      }
-      else {
-        digitalWrite(m1_in1, LOW);
-        digitalWrite(m1_in2, HIGH);
-        digitalWrite(m2_in1, LOW);
-        digitalWrite(m2_in2, HIGH);
-      }*/
-    }
-
-    // wait, all of this is wrong?
-    //if (motor_direction && Setpoint - RPM < 0) {
-    if (motor_direction && Setpoint < 0) {
-      motor_direction = false;
-      //Setpoint = Setpoint * -1;
-      Serial.println("Direction was forward and error is negative so now direction is reverse");
-    }
-    else if (!motor_direction && Setpoint > 0) {
-      motor_direction = true;
-      Serial.println("Direction was reverse and error is positive so now direction is forward");
-    }
     
-    //motor_direction = !motor_direction;
-    if (motor_direction == true) {
-      digitalWrite(m1_in1, HIGH);
-      digitalWrite(m1_in2, LOW);
-      digitalWrite(m2_in1, HIGH);
-      digitalWrite(m2_in2, LOW);
-    }
-    else {
-      digitalWrite(m1_in1, LOW);
-      digitalWrite(m1_in2, HIGH);
-      digitalWrite(m2_in1, LOW);
-      digitalWrite(m2_in2, HIGH);
-    }
-
-    /*boolean curr_motor_direction;
-    int signed_difference;
-    if (RPM - Setpoint > 0) {
-      curr_motor_direction = true;
-    }
-    else if (RPM - Setpoint < 0) {
-      curr_motor_direction = false;
-      
-      RPM = RPM * -1;
-    }*/
-
+    //abs_duration = abs(duration);
     result = myPID.Compute(); //PID conversion is complete and returns 1
     Serial.print("PID PWM output: ");
     //Serial.println(pid_output);
     Serial.print(pid_output);
     Serial.print("  ");
-    /*int pid_output_temp = pid_output; // because can't feed -255 to pwm
-    if (pid_output < 0) {
-      pid_output_temp = pid_output_temp * -1;
-    }
-    analogWrite(en1_pwm, (int)pid_output_temp);*/
     analogWrite(en1_pwm, (int)pid_output);
-
-    Serial.print("Error: ");
-    Serial.print(Setpoint - RPM);
-    Serial.print("  ");
-
-    Serial.print("RPM: ");
+    
+    //Serial.print("RPM: ");
     //Serial.println(RPM);
-    Serial.print(RPM);
-    Serial.print("  ");
-    Serial.println("uT");
+    Serial.print("newPosition: ");
+    Serial.println(newPosition);
+    //Serial.print(RPM);
+    //Serial.print("  ");
+    //Serial.println("uT");
 
     oldPosition = newPosition;
     
