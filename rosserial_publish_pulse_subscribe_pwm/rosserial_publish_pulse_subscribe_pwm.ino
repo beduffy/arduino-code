@@ -2,16 +2,16 @@
 #include <ros.h>
 #include <ros/time.h>
 #include <std_msgs/Int16.h>
-#include <std_msgs/UInt32.h>
+#include <std_msgs/Int32.h>
 
-const int m1_in1 = 10;
-const int m1_in2 = 11;
+const int m1_in1 = 5;   // left
+const int m1_in2 = 7;
 
-const int m2_in1 = 5;
-const int m2_in2 = 7;
+const int m2_in1 = 10;  // right
+const int m2_in2 = 11;
 
-const int en1_pwm = 9;
-const int en2_pwm = 6;
+const int en1_pwm = 6;  // left
+const int en2_pwm = 9;  // right
 
 long oldPositionLeft  = 0;
 long oldPositionRight  = 0;
@@ -29,9 +29,9 @@ unsigned long last_time_for_revolution = millis();
 unsigned long prev_time = start_time;
 
 ros::NodeHandle  nh;
-std_msgs::UInt32 lwheel_pulse_msg;
+std_msgs::Int32 lwheel_pulse_msg;
 ros::Publisher lwheel_pub("lwheel", &lwheel_pulse_msg);
-std_msgs::UInt32 rwheel_pulse_msg;
+std_msgs::Int32 rwheel_pulse_msg;
 ros::Publisher rwheel_pub("rwheel", &rwheel_pulse_msg);
 
 // one callback or two?
@@ -85,8 +85,8 @@ void setup(){
   digitalWrite(m2_in1, HIGH);
   digitalWrite(m2_in2, LOW);
 
-  analogWrite(en1_pwm, 200);
-  analogWrite(en2_pwm, 200);
+  //analogWrite(en1_pwm, 200);
+  //analogWrite(en2_pwm, 200);
 
   start_time = millis();
 
@@ -99,6 +99,8 @@ void setup(){
 }
 
 void loop(){
+  //analogWrite(en1_pwm, 130);
+  //analogWrite(en2_pwm, 130);
   long curr_time = millis() - start_time;
   long time_difference = curr_time - prev_time;
   if (time_difference > check_rpm_period) {
@@ -107,17 +109,9 @@ void loop(){
 
     prev_time = curr_time;
 
-    /*Serial.print("newPositionLeft: ");
-    Serial.print(newPositionLeft);
-    Serial.print("  ");
-
-    Serial.print("newPositionRight: ");
-    Serial.println(newPositionRight);*/
-
-    //lwheel_pulse_msg.data = (std_msgs::UInt32)newPositionLeft;
-    lwheel_pulse_msg.data = (int)newPositionLeft;
+    lwheel_pulse_msg.data = newPositionLeft;
     lwheel_pub.publish(&lwheel_pulse_msg);
-    rwheel_pulse_msg.data = (int)newPositionRight;
+    rwheel_pulse_msg.data = newPositionRight;
     rwheel_pub.publish(&rwheel_pulse_msg);
     
     oldPositionLeft = newPositionLeft;
@@ -152,7 +146,6 @@ void MotorCounterClockwiseLeft(int power) {
     digitalWrite(m1_in1, LOW);
     digitalWrite(m1_in2, LOW);
     
-
     // todo try below?
     /*analogWrite(en1_pwm, lowest_power_value);
     digitalWrite(m1_in1, HIGH);
