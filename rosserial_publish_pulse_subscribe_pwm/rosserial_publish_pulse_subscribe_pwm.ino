@@ -19,7 +19,8 @@ const int check_rpm_period = 20;
 const int lowest_power_value = 50;
 
 // 8423 pulses per revolution by eye
-int pulses_per_revolution = 8423;
+//int pulses_per_revolution = 8423;  // for old worm gear motors
+int pulses_per_revolution = 663;
 
 Encoder myEncLeft(2, 4);
 Encoder myEncRight(3, 12);
@@ -85,8 +86,8 @@ void setup(){
   digitalWrite(m2_in1, HIGH);
   digitalWrite(m2_in2, LOW);
 
-  //analogWrite(en1_pwm, 200);
-  //analogWrite(en2_pwm, 200);
+  analogWrite(en1_pwm, 0);
+  analogWrite(en2_pwm, 0);
 
   start_time = millis();
 
@@ -127,8 +128,10 @@ void loop(){
 void MotorClockwiseLeft(int power) {
   //if(power > lowest_power_value) {
     analogWrite(en1_pwm, power);
-    digitalWrite(m1_in1, HIGH);
-    digitalWrite(m1_in2, LOW);
+    /*digitalWrite(m1_in1, HIGH);
+    digitalWrite(m1_in2, LOW);*/
+    digitalWrite(m1_in1, HIGH-digitalRead(m1_in1));
+    digitalWrite(m1_in2, LOW-digitalRead(m1_in2));
   /*}
   else {
     digitalWrite(m1_in1, LOW);
