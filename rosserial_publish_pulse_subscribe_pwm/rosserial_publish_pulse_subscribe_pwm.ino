@@ -15,16 +15,16 @@ const int en2_pwm = 5;  // right
 
 long oldPositionLeft  = 0;
 long oldPositionRight  = 0;
-//const int check_rpm_period = 20;
-const int check_rpm_period = 500;
+const int check_rpm_period = 20;
 const int lowest_power_value = 50;
 
 // 8423 pulses per revolution by eye
 //int pulses_per_revolution = 8423;  // for old worm gear motors
 int pulses_per_revolution = 663;
 
-Encoder myEncLeft(33, 31);
-Encoder myEncRight(37, 35);
+// it somehow doesn't matter the order you put
+Encoder myEncLeft(2, 31);
+Encoder myEncRight(35, 3);
 long oldPosition  = -999;
 unsigned long start_time = millis();
 unsigned long last_time_for_revolution = millis();
