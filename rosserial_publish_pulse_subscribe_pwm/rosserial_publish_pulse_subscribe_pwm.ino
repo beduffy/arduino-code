@@ -1,8 +1,12 @@
+#include <Servo.h>
 #include <Encoder.h>
 #include <ros.h>
 #include <ros/time.h>
+#include <rosserial_arduino/Test.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Int32.h>
+
+using rosserial_arduino::Test;
 
 const int m1_in1 = 27;   // left
 const int m1_in2 = 29;
@@ -21,6 +25,8 @@ const int lowest_power_value = 50;
 // 8423 pulses per revolution by eye
 //int pulses_per_revolution = 8423;  // for old worm gear motors
 int pulses_per_revolution = 663;
+
+Servo gripper_servo; 
 
 // it somehow doesn't matter the order you put
 Encoder myEncLeft(2, 31);
@@ -73,6 +79,15 @@ void right_motor_cmd_callback( const std_msgs::Int16& cmd_msg){
 ros::Subscriber<std_msgs::Int16> rmotor_sub("lmotor_cmd", left_motor_cmd_callback);
 ros::Subscriber<std_msgs::Int16> lmotor_sub("rmotor_cmd", right_motor_cmd_callback);
 
+void servo_srv_callback(const Test::Request & req, Test::Response & res){
+  //int servo_microsecond_delay = parseInt(req.input);
+  int servo_microsecond_delay = atoi(req.input);
+
+  gripper_servo.writeMicroseconds(servo_microsecond_delay);
+}
+
+ros::ServiceServer<Test::Request, Test::Response> servo_server("test_srv", &servo_srv_callback);
+
 void setup() {
   pinMode(m1_in1, OUTPUT);
   pinMode(m1_in2, OUTPUT);
@@ -94,18 +109,21 @@ void setup() {
   // for testing
   //analogWrite(en1_pwm, 80);
   //analogWrite(en2_pwm, 80);  
-  //MotorClockwiseRight(110);
+  //MotorClockwiseRight(45);
   //MotorCounterClockwiseRight(80);
-  //MotorClockwiseLeft(60);
+  //MotorClockwiseLeft(20);
   //MotorCounterClockwiseLeft(80);
 
   start_time = millis();
+
+  gripper_servo.attach(9);
 
   nh.initNode();
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
   nh.advertise(lwheel_pub);
   nh.advertise(rwheel_pub);
+  nh.advertiseService(servo_server);
 }
 
 void loop() {
