@@ -165,44 +165,44 @@ void MotorClockwiseLeft(int power) {
 }
 
 void MotorCounterClockwiseLeft(int power) {
-  if(power > lowest_power_value) {
+  //if(power > lowest_power_value) {
     analogWrite(en1_pwm, power);
     digitalWrite(m1_in1, LOW);
     digitalWrite(m1_in2, HIGH);
-  }
-  else {
-    digitalWrite(m1_in1, LOW);
-    digitalWrite(m1_in2, LOW);
+  //}
+  //else {
+    //digitalWrite(m1_in1, LOW);
+    //digitalWrite(m1_in2, LOW);
     
     // todo try below?
     /*analogWrite(en1_pwm, lowest_power_value);
     digitalWrite(m1_in1, HIGH);
     digitalWrite(m1_in2, LOW);*/
-  }
+  //}
 }
 
 void MotorClockwiseRight(int power) {
-  if(power > lowest_power_value) {
+  //if(power > lowest_power_value) {
     analogWrite(en2_pwm, power);
     digitalWrite(m2_in1, HIGH);
     digitalWrite(m2_in2, LOW);
     /*digitalWrite(m2_in1, HIGH-digitalRead(m2_in1));
     digitalWrite(m2_in2, LOW-digitalRead(m2_in2));*/
-  }
+  /*}
   else {
     digitalWrite(m2_in1, LOW);
     digitalWrite(m2_in2, LOW);
-  }
+  }*/
 }
 
 void MotorCounterClockwiseRight(int power) {
-  if(power > lowest_power_value) {
+  //if(power > lowest_power_value) {
     analogWrite(en2_pwm, power);
     digitalWrite(m2_in1, LOW);
     digitalWrite(m2_in2, HIGH);
-  }
-  else {
+  //}
+  /*else {
     digitalWrite(m2_in1, LOW);
     digitalWrite(m2_in2, LOW);
-  }
+  }*/
 }
