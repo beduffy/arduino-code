@@ -29,7 +29,11 @@ int pulses_per_revolution = 663;
 Servo gripper_servo; 
 
 // it somehow doesn't matter the order you put
-Encoder myEncLeft(2, 31);
+//Encoder myEncLeft(2, 31);
+
+const int PIN_ENCOD_A_MOTOR_LEFT = 2;    
+volatile float pos_left = 0;       //Left motor encoder position
+
 Encoder myEncRight(35, 3);
 long oldPosition  = -999;
 unsigned long start_time = millis();
@@ -89,6 +93,7 @@ void servo_srv_callback(const Test::Request & req, Test::Response & res){
 ros::ServiceServer<Test::Request, Test::Response> servo_server("test_srv", &servo_srv_callback);
 
 void setup() {
+ 
   pinMode(m1_in1, OUTPUT);
   pinMode(m1_in2, OUTPUT);
   pinMode(m2_in1, OUTPUT);
@@ -107,13 +112,25 @@ void setup() {
   //MotorClockwiseRight(255);
   //MotorCounterClockwiseRight(80);
   //MotorClockwiseLeft(255);
-  MotorCounterClockwiseLeft(80);
+  //MotorCounterClockwiseLeft(80);
 
   start_time = millis();
 
   gripper_servo.attach(9);
+
+  pinMode(PIN_ENCOD_A_MOTOR_LEFT, INPUT); 
+  //pinMode(PIN_ENCOD_B_MOTOR_LEFT, INPUT);
+  digitalWrite(PIN_ENCOD_A_MOTOR_LEFT, HIGH);                // turn on pullup resistor
+  //digitalWrite(PIN_ENCOD_B_MOTOR_LEFT, HIGH);
+  //attachInterrupt(0, encoderLeftMotor, RISING);
+  //attachInterrupt(0, encoderLeftMotor, CHANGE);
+  //attachInterrupt(0, encoderLeftMotor, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(PIN_ENCOD_A_MOTOR_LEFT), encoderLeftMotor, CHANGE);
+  //attachInterrupt(digitalPinToInterrupt(PIN_ENCOD_A_MOTOR_LEFT), encoderLeftMotor, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENCOD_A_MOTOR_LEFT), encoderLeftMotor, FALLING);
   
   nh.initNode();
+  //nh.getHardware()->setBaud(115200);
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
   nh.advertise(lwheel_pub);
@@ -125,19 +142,21 @@ void loop() {
   long curr_time = millis() - start_time;
   long time_difference = curr_time - prev_time;
   if (time_difference > check_rpm_period) {
-    long newPositionLeft = myEncLeft.read();
+    //long newPositionLeft = myEncLeft.read();
     long newPositionRight = myEncRight.read();
 
-    Serial.println(newPositionLeft);
+    //Serial.println(pos_left);
+    //pos_left = digitalRead(PIN_ENCOD_A_MOTOR_LEFT);
+    //pos_left = analogRead(A0);
 
     prev_time = curr_time;
 
-    lwheel_pulse_msg.data = newPositionLeft;
+    lwheel_pulse_msg.data = pos_left;
     lwheel_pub.publish(&lwheel_pulse_msg);
     rwheel_pulse_msg.data = newPositionRight;
     rwheel_pub.publish(&rwheel_pulse_msg);
     
-    oldPositionLeft = newPositionLeft;
+    oldPositionLeft = pos_left;
     oldPositionRight = newPositionRight;
   }
 
@@ -146,6 +165,11 @@ void loop() {
   //delay(1);  // todo keep or not? don't
 }
 
+void encoderLeftMotor() {
+  pos_left++;
+  //if (digitalRead(PIN_ENCOD_A_MOTOR_LEFT) == digitalRead(PIN_ENCOD_B_MOTOR_LEFT)) pos_left++;
+  //else pos_left--;
+}
 
 void MotorClockwiseLeft(int power) {
   analogWrite(en1_pwm, power);
