@@ -58,8 +58,8 @@ void right_motor_cmd_callback( const std_msgs::Int16& cmd_msg){
   }
 }
 
-ros::Subscriber<std_msgs::Int16> rmotor_sub("lmotor_cmd", left_motor_cmd_callback);
-ros::Subscriber<std_msgs::Int16> lmotor_sub("rmotor_cmd", right_motor_cmd_callback);
+ros::Subscriber<std_msgs::Int16> lmotor_sub("lmotor_cmd", left_motor_cmd_callback);
+ros::Subscriber<std_msgs::Int16> rmotor_sub("rmotor_cmd", right_motor_cmd_callback);
 
 /*void servo_srv_callback(const Test::Request & req, Test::Response & res) {
   // when we had an arm, we used this, but no arm anymore
