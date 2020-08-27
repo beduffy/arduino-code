@@ -22,11 +22,9 @@ long oldPositionRight  = 0;
 const int check_rpm_period = 20;
 const int lowest_power_value = 50;
 
-// 8423 pulses per revolution by eye
-//int pulses_per_revolution = 8423;  // for old worm gear motors
 int pulses_per_revolution = 663;
 
-Servo gripper_servo; 
+//Servo gripper_servo;
 
 // it somehow doesn't matter the order you put
 Encoder myEncLeft(2, 31);
@@ -42,36 +40,20 @@ ros::Publisher lwheel_pub("lwheel", &lwheel_pulse_msg);
 std_msgs::Int32 rwheel_pulse_msg;
 ros::Publisher rwheel_pub("rwheel", &rwheel_pulse_msg);
 
-// one callback or two?
-// Float32? or int?
-
-void left_motor_cmd_callback( const std_msgs::Int16& cmd_msg){
-  //Serial.println("Within left Callback");
-  /*digitalWrite(m1_in1, HIGH-digitalRead(m1_in1));
-  digitalWrite(m1_in2, LOW-digitalRead(m1_in2));*/
-
+void left_motor_cmd_callback( const std_msgs::Int16& cmd_msg) {
   if(cmd_msg.data > 0) {
-    // todo delete or duplicate
-    //motor_value = constrain(motor_value, 60, 255);
     MotorClockwiseLeft(abs(cmd_msg.data));
   }
   else {
-    //motor_value = constrain(motor_value, -255, -60);
     MotorCounterClockwiseLeft(abs(cmd_msg.data));
   }
 }
 
 void right_motor_cmd_callback( const std_msgs::Int16& cmd_msg){
-  //Serial.println("Within right Callback");
-  /*digitalWrite(m2_in1, HIGH-digitalRead(m2_in1));
-  digitalWrite(m2_in2, LOW-digitalRead(m2_in2));*/
-
   if(cmd_msg.data > 0) {
-    //motor_value = constrain(motor_value, 60, 255);
     MotorClockwiseRight(abs(cmd_msg.data));
   }
   else {
-    //motor_value = constrain(motor_value, -255, -60);
     MotorCounterClockwiseRight(abs(cmd_msg.data));
   }
 }
@@ -79,14 +61,14 @@ void right_motor_cmd_callback( const std_msgs::Int16& cmd_msg){
 ros::Subscriber<std_msgs::Int16> rmotor_sub("lmotor_cmd", left_motor_cmd_callback);
 ros::Subscriber<std_msgs::Int16> lmotor_sub("rmotor_cmd", right_motor_cmd_callback);
 
-void servo_srv_callback(const Test::Request & req, Test::Response & res){
-  //int servo_microsecond_delay = parseInt(req.input);
+/*void servo_srv_callback(const Test::Request & req, Test::Response & res) {
+  // when we had an arm, we used this, but no arm anymore
   int servo_microsecond_delay = atoi(req.input);
 
   gripper_servo.writeMicroseconds(servo_microsecond_delay);
 }
 
-ros::ServiceServer<Test::Request, Test::Response> servo_server("test_srv", &servo_srv_callback);
+ros::ServiceServer<Test::Request, Test::Response> servo_server("test_srv", &servo_srv_callback);*/
 
 void setup() {
   pinMode(m1_in1, OUTPUT);
@@ -103,22 +85,22 @@ void setup() {
 
   // for testing
   //analogWrite(en1_pwm, 80);
-  //analogWrite(en2_pwm, 80);  
+  //analogWrite(en2_pwm, 80);
   //MotorClockwiseRight(255);
   //MotorCounterClockwiseRight(80);
   //MotorClockwiseLeft(255);
-  MotorCounterClockwiseLeft(80);
+  //MotorCounterClockwiseLeft(80);
 
   start_time = millis();
 
-  gripper_servo.attach(9);
+  //gripper_servo.attach(9);
   
   nh.initNode();
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
   nh.advertise(lwheel_pub);
   nh.advertise(rwheel_pub);
-  nh.advertiseService(servo_server);
+  //nh.advertiseService(servo_server);
 }
 
 void loop() {
@@ -142,8 +124,6 @@ void loop() {
   }
 
   nh.spinOnce();
-  
-  //delay(1);  // todo keep or not? don't
 }
 
 
