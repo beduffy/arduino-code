@@ -8,14 +8,16 @@
 
 using rosserial_arduino::Test;
 
-const int m1_in1 = 27;   // left
-const int m1_in2 = 29;
+// right
+const int m1_in1 = 23;   // in1
+const int m1_in2 = 29;   // in2
 
-const int m2_in1 = 23;  // right
-const int m2_in2 = 25;
+// left
+const int m2_in1 = 35;  // in3
+const int m2_in2 = 44;  // in4
 
-const int en1_pwm = 6;  // left
-const int en2_pwm = 5;  // right
+const int en1_pwm = 6;  // right. ENA
+const int en2_pwm = 5;  // left. ENB
 
 long oldPositionLeft  = 0;
 long oldPositionRight  = 0;
@@ -27,8 +29,8 @@ int pulses_per_revolution = 663;
 //Servo gripper_servo;
 
 // it somehow doesn't matter the order you put
-Encoder myEncLeft(2, 31);
-Encoder myEncRight(35, 3);
+Encoder myEncLeft(2, 50);
+Encoder myEncRight(9, 3);  // todo should be 2 and 3
 long oldPosition  = -999;
 unsigned long start_time = millis();
 unsigned long last_time_for_revolution = millis();
@@ -92,8 +94,10 @@ void setup() {
   //MotorCounterClockwiseLeft(80);
 
   start_time = millis();
-
   //gripper_servo.attach(9);
+
+  TCCR3B = TCCR3B & B11111000 | B00000001;    // set timer 3 divisor to     1 for PWM frequency of 31372.55 Hz
+  TCCR4B = TCCR4B & B11111000 | B00000001;    // set timer 4 divisor to     1 for PWM frequency of 31372.55 Hz
   
   nh.initNode();
   nh.subscribe(lmotor_sub);
@@ -128,25 +132,25 @@ void loop() {
 
 
 void MotorClockwiseLeft(int power) {
-  analogWrite(en1_pwm, power);
-  digitalWrite(m1_in1, HIGH);
-  digitalWrite(m1_in2, LOW);
-}
-
-void MotorCounterClockwiseLeft(int power) {
-  analogWrite(en1_pwm, power);
-  digitalWrite(m1_in1, LOW);
-  digitalWrite(m1_in2, HIGH);
-}
-
-void MotorClockwiseRight(int power) {
   analogWrite(en2_pwm, power);
   digitalWrite(m2_in1, HIGH);
   digitalWrite(m2_in2, LOW);
 }
 
-void MotorCounterClockwiseRight(int power) {
+void MotorCounterClockwiseLeft(int power) {
   analogWrite(en2_pwm, power);
   digitalWrite(m2_in1, LOW);
   digitalWrite(m2_in2, HIGH);
+}
+
+void MotorClockwiseRight(int power) {
+  analogWrite(en1_pwm, power);
+  digitalWrite(m1_in1, HIGH);
+  digitalWrite(m1_in2, LOW);
+}
+
+void MotorCounterClockwiseRight(int power) {
+  analogWrite(en1_pwm, power);
+  digitalWrite(m1_in1, LOW);
+  digitalWrite(m1_in2, HIGH);
 }
