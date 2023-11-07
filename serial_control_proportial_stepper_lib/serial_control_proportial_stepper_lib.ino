@@ -34,7 +34,7 @@ float cur_abs_degrees = 0;
 void setup() {
   Serial.begin(9600);
   stepper.setMaxSpeed(4000);
-  stepper.setSpeed(1000);
+  stepper.setSpeed(4000);
   // stepper.setAcceleration(500);
 }
 
@@ -89,26 +89,43 @@ void loop()
         // Serial.print("  num_degrees_to_change_by: ");
         // Serial.println(num_degrees_to_change_by);
   }
+
+
   // stepper.setCurrentPosition(incoming_absolute_steps);  // homes so nope
 
+  // incoming_absolute_steps = 1000;
   stepper.moveTo(incoming_absolute_steps);
 
+  // if (stepper.distanceToGo() == 0)
+  //   {
+  //       // Random change to speed, position and acceleration
+  //       // Make sure we dont get 0 speed or accelerations
+  //       delay(1000);
+  //       stepper.moveTo(rand() % 1000);
+  //   }
+
+  
+
+    // TODO PID position control is too jagged, should be velocity control instead?
+
   int chosen_speed = 4000;
-  int steps_to_go = stepper.distanceToGo();
-  Serial.println(steps_to_go);
-  if (steps_to_go > 0) {
-    stepper.setSpeed(chosen_speed);
-  }
-  else if (steps_to_go < 0) {
-    stepper.setSpeed(-chosen_speed);
-  }
-  else {
-    stepper.setSpeed(0);
-  }
+  // int steps_to_go = stepper.distanceToGo();
+  // Serial.println(steps_to_go);
+  // if (steps_to_go > 0) {
+  //   stepper.setSpeed(chosen_speed);
+  // }
+  // else if (steps_to_go < 0) {
+  //   stepper.setSpeed(-chosen_speed);
+  // }
+  // else {
+  //   stepper.setSpeed(0);
+  // }
+
+  stepper.setSpeed(4000);
   
   // stepper.setSpeed(1000);
-  // bool output = stepper.runSpeedToPosition();
-  bool output = stepper.runSpeed();
+  bool output = stepper.runSpeedToPosition();
+  // bool output = stepper.runSpeed();
   // bool output = stepper.run();
   // Serial.println(output);
 }
