@@ -93,6 +93,8 @@ void loop()
 
   // stepper.setCurrentPosition(incoming_absolute_steps);  // homes so nope
 
+  // TODO would it be possible to go straight from pixel horizontal dist to the relative angle? study pinhole and do experiments and calculate foV horizontal
+
   // incoming_absolute_steps = 1000;
   stepper.moveTo(incoming_absolute_steps);
 
