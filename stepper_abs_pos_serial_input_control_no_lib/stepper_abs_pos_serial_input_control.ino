@@ -25,7 +25,8 @@ char receivedChars[numChars];   // an array to store the received data
 boolean newData = false;
 
 float num_degrees_to_change_by;
-float absolute_degrees = 45;
+float incoming_absolute_degrees = 45;
+float new_angle_to_change_to;
 float cur_abs_degrees = 0;
 
 int calculate_how_many_steps_to_go_to_new_absolute_degrees() {
@@ -66,15 +67,33 @@ void loop()  {
   
   recvWithEndMarker();
   if (newData == true) {
-        Serial.print("New angle ");
-        Serial.println(receivedChars);
+        
         newData = false;
         incoming_absolute_degrees = atof(receivedChars);
 
-        num_degrees_to_change_by = cur_abs_degrees - incoming_absolute_degrees;
+        // math for num_degrees_to_change_by. steppers are relative but we can track absolute position without skipped steps
+        // we start at 0 degrees, if 100 comes in, we should go to +100, if -100 comes in we should go to -100
+        
+        // e.g. then we are at -100, if +100 comes in we should change by 200 degrees, if -100, then 0, 
+        // if 0 comes in, we should change by +100
+        // +100 - (-100) = 200
+        // -100 - (-100) = 0 stay same
+        // 0 - (-100) = 100
+
+
+
+        // new_angle_to_change_to = cur_abs_degrees + incoming_absolute_degrees;
+        // num_degrees_to_change_by = cur_abs_degrees + new_angle_to_change_to;
+
+        num_degrees_to_change_by = incoming_absolute_degrees - cur_abs_degrees;
         cur_abs_degrees = incoming_absolute_degrees;
 
         int num_steps = step_degree(num_degrees_to_change_by);
+        Serial.print("New incoming angle ");
+        Serial.print(receivedChars);
+        Serial.print(" New angle to change to ");
+        Serial.print(num_degrees_to_change_by);
+        Serial.print("  num_degrees_to_change_by: ");
         Serial.println(num_degrees_to_change_by);
 
         if (num_degrees_to_change_by < 0.0) {
