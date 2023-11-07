@@ -10,7 +10,7 @@
 #include <AccelStepper.h>
  
 // Define a stepper and the pins it will use
-AccelStepper stepper; // Defaults to AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5
+AccelStepper stepper(1, 2, 5); // Defaults to AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4, 5
  
 // This defines the analog input pin for reading the control voltage
 // Tested with a 10k linear pot between 5v and GND
@@ -18,15 +18,11 @@ AccelStepper stepper; // Defaults to AccelStepper::FULL4WIRE (4 pins) on 2, 3, 4
  
 void setup()
 {  
-  stepper.setMaxSpeed(1000);
+  stepper.setMaxSpeed(4000);
 }
  
-// TODO actually connect potentiometer!! and do this for speed control too
-// TODO actually store current angle, and then build script that is always going towards desired angle. 
-// TODO connect webcam pan with hack to stepper and make it rotate 360 degrees and track me very fast.
+// TODO make webcam rotate 360 degrees and track me very fast.
 // TODO modulus degrees so 360 and 1 degree are 1 degree apart
-// TODO print coupling plate for webcam
-// TODO flask to jetson to serial? Or is there another way?
 // TODO HOw to make acceleration and actual PID with stepper motors?
 // TODO how to find all bottle necks, remove them and make things extremely fast?
 
@@ -36,6 +32,6 @@ void loop()
   // int analog_in = analogRead(ANALOG_IN);
   int analog_in = 1000;
   stepper.moveTo(analog_in);
-  stepper.setSpeed(100);
+  stepper.setSpeed(4000);
   stepper.runSpeedToPosition();
 }
