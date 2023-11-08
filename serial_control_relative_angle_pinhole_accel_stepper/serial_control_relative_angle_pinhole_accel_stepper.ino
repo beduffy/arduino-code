@@ -32,7 +32,7 @@ float cur_abs_degrees = 0;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   stepper.setMaxSpeed(4000);
   stepper.setSpeed(4000);
   // stepper.setAcceleration(500);
@@ -126,7 +126,7 @@ void loop()
   //   stepper.setSpeed(0);
   // }
 
-  stepper.setSpeed(1000);
+  stepper.setSpeed(4000);
   
   // stepper.setSpeed(1000);
   bool output = stepper.runSpeedToPosition();
