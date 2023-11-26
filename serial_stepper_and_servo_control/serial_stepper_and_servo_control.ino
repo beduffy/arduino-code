@@ -113,7 +113,7 @@ void loop()
   // int chosen_speed = 4000;
   int steps_to_go = stepper.distanceToGo();
 
-  stepper.setSpeed(4000);
+  stepper.setSpeed(2000);
   
   bool output = stepper.runSpeedToPosition();
 }
