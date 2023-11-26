@@ -14,7 +14,7 @@
 // GND	GND	1⁄8	1⁄256	stealthChop2   // nothing connected to ms1 or 2. So 1/8 of 1.8 degrees is 1/8 * 1.8 = 0.225 degrees. so 800 below would be 180 degrees
 // VIO	VIO	1⁄16	1⁄256	stealthChop2  // if i wanted max res: 1/16 of 1.8 degrees is (1/16) * 1.8 = 0.1125 degrees...
 
-float num_degrees = 45;
+float num_degrees = 90;
 const float resolution  = 0.225; // put your step resolution here
 int step_degree(float desired_degree){
     return (desired_degree/resolution);
