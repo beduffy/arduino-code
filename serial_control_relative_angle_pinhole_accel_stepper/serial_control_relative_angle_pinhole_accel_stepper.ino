@@ -6,7 +6,7 @@
 #include <AccelStepper.h>
  
 // Define a stepper and the pins it will use
-AccelStepper stepper;
+AccelStepper stepper(1, 2, 5);  // TODO before it was without 1, 2,5 and degrees were wrong? Check if it still works with python. Maybe pinhole divisoon by 5 was wrong
 
 // MS2(-)	MS1(-)	Steps(-)	Interpolation(-)	Mode(-)
 // GND	VIO	1⁄2	1⁄256	stealthChop2
@@ -43,6 +43,9 @@ void recvWithEndMarker() {
     char endMarker = '\n';
     char rc;
     
+    // TODO time everything, is the stepper slow or serial connection slow? 
+    // https://arduino.stackexchange.com/questions/9666/how-to-avoid-blocking-while-loop-reading-serial
+    // https://forum.arduino.cc/t/serial-input-basics/278284/5
     while (Serial.available() > 0 && newData == false) {
         rc = Serial.read();
 
